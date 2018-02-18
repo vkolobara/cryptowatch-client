@@ -11,7 +11,7 @@ class CryptoWatchClient(object):
 
     def get_ohlc(self, pair, periods = [60,180,300,21600,86400]):
         logging.info("Download OHLC for %s for periods %s" % (pair, str(periods)))
-        latest_times = list(CryptoWatchClient.get_latest_times(self.exchange, pair, periods, self.out_file))
+        latest_times = CryptoWatchClient.get_latest_times(self.exchange, pair, periods, self.out_file)
         after = min(latest_times)
         url = self.base_url + '/' + pair + '/ohlc?'
         params = '&'.join(["after=%s" % after, 
@@ -24,16 +24,22 @@ class CryptoWatchClient(object):
             data = r.json()
             for period in data['result']:
                 w = writer.CSVWriter(self.out_file + "_%s_%s_%s.csv" % (self.exchange, pair, period))
-                rows = list(filter(lambda x: int(x[0]) > latest_times[ix], data['result'][period]))
-                w.write(data['result'][period])
+                rows = [x for x in data['result'][period] if int(x[0]) > latest_times[ix]]
+                w.write(rows)
         logging.info("OHLC downloaded")
 
     @staticmethod
     def get_latest_times(exchange, pair, periods, file):
+        ret = []
         for period in periods:
             file_name = file + "_%s_%s_%s.csv.last_time" % (exchange, pair, period)
-            if not os.path.exists(file_name):
-                yield 0
+            if os.path.exists(file_name):
+                with open(file_name, 'r') as fil:
+                    line = fil.readline()
+                    if line != '':
+                        ret.append(int(line))
+                    else:
+                        ret.append(0)
             else:
-                with open(file_name, 'r') as f:
-                    yield int(f.readline().split(",")[0])
+                ret.append(0)
+        return ret

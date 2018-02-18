@@ -24,10 +24,11 @@ class CSVWriter(Writer):
 
     def write(self, rows):
         logging.info("Writing rows to %s" % self.out)
-        with open(self.out, 'a', newline='') as csvfile:
-            writer = csv.writer(csvfile, delimiter=',')
-            for row in rows:
-                writer.writerow(row)
-            with open(self.out + ".last_time", 'w') as f:
-                f.write(str(row[0]))
+        if len(rows) > 0:
+            with open(self.out, 'a', newline='') as csvfile:
+                writer = csv.writer(csvfile, delimiter=',')
+                for row in rows:
+                    writer.writerow(row)
+                with open(self.out + ".last_time", 'w') as f:
+                    f.write(str(rows[-1][0]))
         logging.info("%d rows written to %s" % (len(rows), self.out))
