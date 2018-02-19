@@ -1,3 +1,3 @@
 config = {
-  "pairs": ["btcusd", "xrpusd", "xmrusd", "omgusd", "ltcusd", "ethusd", "zecusd"]
+  "pairs": ["btcusd", "xrpusd", "xmrusd", "omgusd", "ltcusd", "ethusd", "zecusd", "iotusd"]
 }
